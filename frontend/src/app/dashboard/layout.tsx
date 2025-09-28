@@ -9,7 +9,7 @@ import { useUser } from "@auth0/nextjs-auth0"
 // Helper to fetch sessions from FastAPI
 async function getSessions(accessToken: string) {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sessions`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sessions/`, {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
