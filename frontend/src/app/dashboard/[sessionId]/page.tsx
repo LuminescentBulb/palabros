@@ -126,7 +126,7 @@ export default function ChatSession({ params }: { params: Promise<{ sessionId: s
                 setLoading(true)
 
                 // First, create a new session
-                fetch(`${process.env.BACKEND_URL}:8000/sessions/`, {
+                fetch(`${process.env.BACKEND_URL}/sessions/`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

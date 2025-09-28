@@ -104,15 +104,61 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Right: Graphic */}
+          {/* Right: Chat Preview */}
           <div className="relative flex justify-center lg:justify-end">
-            {/* Replace with your SVG / image */}
-            <div className="w-[300px] h-[500px] rounded-2xl overflow-hidden shadow-2xl bg-white/90 backdrop-blur-lg">
-              <img
-                src="/chat-preview.png"
-                alt="Chatbot Preview"
-                className="w-full h-full object-cover"
-              />
+            <div className="w-[350px] h-[600px] rounded-2xl overflow-hidden shadow-2xl bg-white backdrop-blur-lg">
+              {/* Chat Header */}
+              <div className="bg-gray-100 p-4 border-b">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-indigo-500 rounded-full"></div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">Palabros AI</h4> 
+                  </div>
+                </div>
+              </div>
+              
+              {/* Chat Messages */}
+              <div className="p-4 space-y-4 h-[450px] bg-gray-50">
+                {/* User message */}
+                <div className="flex justify-end">
+                  <div className="max-w-[250px] bg-blue-500 text-center text-white rounded-lg p-3">
+                    <p className="text-sm">hola ¿donde estás tú?</p>
+                  </div>
+                </div>
+                
+                {/* AI Response with tooltip */}
+                <div className="flex justify-start">
+                  <div className="max-w-[280px]">
+                    <div className="bg-white rounded-lg p-3 shadow-sm border relative">
+                      <p className="text-sm text-gray-800 mb-2">
+                        <span className="bg-blue-100 px-1 rounded cursor-pointer hover:bg-blue-200 transition-colors">
+                          **tú**
+                        </span> Translation: you (singular) (pronoun)
+                      </p>
+                      <p className="text-xs text-gray-500">Example: Tú eres mi mejor amigo.</p>
+                      <p className="text-xs text-gray-500">→ You are my best friend.</p>
+                    </div>
+                    <div className="bg-gray-800 text-white text-center rounded-lg p-3 mt-2 max-w-[140px]">
+                        <p className="text-sm">en la biblioteca</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Chat Input */}
+              <div className="p-4 bg-white border-t">
+                <div className="flex items-center space-x-2">
+                  <input 
+                    type="text" 
+                    placeholder="Type your message..."
+                    className="flex-1 px-3 py-2 border rounded-lg text-sm bg-gray-50"
+                    disabled
+                  />
+                  <button className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                    Send
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
