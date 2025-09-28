@@ -1,0 +1,121 @@
+
+{
+  "Mexico": {
+    "güey": {
+      "definition": "Amigo, persona (coloquial en México)",
+      "gloss": "dude, bro"
+    },
+    "molido": {
+      "definition": "Muy cansado",
+      "gloss": "exhausted"
+    },
+    "órale": {
+      "definition": "Expresión de sorpresa o acuerdo (México)",
+      "gloss": "wow, okay, let’s go"
+    },
+    "chido": {
+      "definition": "Bonito, bueno o de buena calidad",
+      "gloss": "cool, nice"
+    },
+    "neta": {
+      "definition": "Verdad, en serio",
+      "gloss": "for real, the truth"
+    },
+    "qué onda": {
+      "definition": "Saludo informal, ¿cómo estás?",
+      "gloss": "what's up?"
+    },
+    "aguas": {
+      "definition": "Expresión para advertir de un peligro",
+      "gloss": "watch out!, be careful!"
+    },
+    "chamba": {
+      "definition": "Trabajo, empleo",
+      "gloss": "work, job"
+    },
+    "fresa": {
+      "definition": "Persona presumida y de clase social alta",
+      "gloss": "snobby, posh"
+    },
+    "chela": {
+      "definition": "Cerveza",
+      "gloss": "beer"
+    }
+  },
+  "Spain": {
+    "tío": {
+      "definition": "Forma coloquial de dirigirse a alguien (España)",
+      "gloss": "dude, guy"
+    },
+    "vale": {
+      "definition": "Expresión para decir 'de acuerdo'",
+      "gloss": "okay, alright"
+    },
+    "guay": {
+      "definition": "Estupendo, genial, muy bueno",
+      "gloss": "cool, great"
+    },
+    "flipar": {
+      "definition": "Estar muy sorprendido o entusiasmado",
+      "gloss": "to be amazed, to freak out"
+    },
+    "majo": {
+      "definition": "Persona agradable, simpática",
+      "gloss": "nice, friendly"
+    },
+    "currar": {
+      "definition": "Trabajar",
+      "gloss": "to work"
+    },
+    "cabreado": {
+      "definition": "Enojado, de mal humor",
+      "gloss": "pissed off, angry"
+    },
+    "molar": {
+      "definition": "Gustar mucho",
+      "gloss": "to be cool, to really like"
+    },
+    "pasta": {
+      "definition": "Dinero",
+      "gloss": "money, dough"
+    }
+  },
+  "Argentina": {
+    "che": {
+      "definition": "Forma de dirigirse a alguien (Argentina)",
+      "gloss": "mate, dude"
+    },
+    "quilombo": {
+      "definition": "Problema, lío, caos",
+      "gloss": "mess, chaos"
+    },
+    "boludo": {
+      "definition": "Forma coloquial de dirigirse a un amigo, también puede ser un insulto",
+      "gloss": "dude, idiot (depending on context)"
+    },
+    "laburo": {
+      "definition": "Trabajo",
+      "gloss": "work, job"
+    },
+    "pibe/piba": {
+      "definition": "Chico o chica, joven",
+      "gloss": "guy, girl, kid"
+    },
+    "bondi": {
+      "definition": "Autobús",
+      "gloss": "bus"
+    },
+    "fiaca": {
+      "definition": "Pereza, falta de ganas de hacer algo",
+      "gloss": "laziness, sloth"
+    },
+    "mina": {
+      "definition": "Mujer, chica (a veces de forma despectiva)",
+      "gloss": "woman, chick"
+    },
+    "chamuyar": {
+      "definition": "Intentar convencer a alguien con palabras, a menudo con fines románticos",
+      "gloss": "to sweet-talk, to chat someone up"
+    }
+  }
+}

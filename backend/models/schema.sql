@@ -5,13 +5,14 @@ CREATE TABLE IF NOT EXISTS users (
     display_name TEXT,
     dialect TEXT,             -- e.g. "Mexico", "Spain", "Argentina"
     experience_level TEXT,    -- e.g. "beginner", "intermediate", "advanced"
-    facts JSONB DEFAULT '{}'  -- flexible facts field
+    facts JSONB DEFAULT '{}',  -- flexible facts field
     created_at TIMESTAMP DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    session_name TEXT NOT NULL,
     dialect TEXT NOT NULL,
     summary TEXT,
     created_at TIMESTAMP DEFAULT now(),

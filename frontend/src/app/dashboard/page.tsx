@@ -1,17 +1,28 @@
-import { auth0 } from "@/lib/auth0"
+"use client"
 
-export default async function DashboardHome() {
-  const session = await auth0.getSession()
-  const name = session?.user?.name || "friend"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useUser } from "@auth0/nextjs-auth0"
+
+export default function DashboardHome() {
+  const [topic, setTopic] = useState("")
+  const router = useRouter()
+  const { user } = useUser()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!topic.trim() || !user?.sub) return
+
+    // Simply redirect to new session with first message - let [sessionId]/page.tsx handle session creation
+    router.push(`/dashboard/new?first=${encodeURIComponent(topic)}`)
+    setTopic("")
+  }
 
   return (
     <div className="flex flex-col items-center justify-center h-full px-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-4">
         Welcome back,{" "}
-        <span className="bg-blue-400 bg-clip-text text-transparent">
-          {name}
-        </span>{" "}
-        👋
+        <span className="bg-blue-400 bg-clip-text text-transparent">amigo</span> 👋
       </h1>
 
       <p className="text-gray-600 mb-10 text-center max-w-xl">
@@ -20,9 +31,14 @@ export default async function DashboardHome() {
 
       {/* New Chat Input */}
       <div className="w-full max-w-2xl">
-        <form className="flex items-center bg-gray-100 rounded-full px-5 py-3 shadow-sm hover:shadow transition">
+        <form
+          onSubmit={handleSubmit}
+          className="flex items-center bg-gray-100 rounded-full px-5 py-3 shadow-sm hover:shadow transition"
+        >
           <input
             type="text"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
             placeholder="Inicia una nueva conversación..."
             className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-500"
           />
