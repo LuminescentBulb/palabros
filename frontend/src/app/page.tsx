@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { MessageCircle, Globe, Zap, BookOpen, Star } from "lucide-react"
 import { auth0 } from "@/lib/auth0"
+import Footer from "@/components/footer"
 
 export default async function HomePage() {
   const session = await auth0.getSession();
@@ -303,6 +304,8 @@ export default async function HomePage() {
           </Button>
         </div>
       </section>
+
+      <Footer />
     </div>
   )
 }
