@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from backend.core.utils import get_current_user, get_db
+from backend.references.sentence_parser import dictionary
 import os, json, requests
 import spacy
 from google import genai
@@ -71,7 +72,7 @@ async def get_session_messages(
     # Fetch messages for the session
     rows = await db.fetch(
         """
-        SELECT id, sender, content, created_at
+        SELECT id, sender, content, token_metadata, created_at
         FROM messages
         WHERE session_id = $1
         ORDER BY created_at ASC
@@ -104,24 +105,43 @@ with open(GLOSSARY_PATH, "r", encoding="utf-8") as f:
     SLANG_GLOSSARY = json.load(f)
 
 
-def build_dictionary_context(text: str, dialect: str):
-    doc = nlp(text)
-    terms = []
-
-    for token in doc:
-        if token.is_stop or token.is_punct:
-            continue
-        lemma = token.lemma_.lower()
-
-        if lemma in SLANG_GLOSSARY:
-            entry = SLANG_GLOSSARY[lemma]
-            terms.append({
-                "term": token.text,
-                "definition": entry["definition"],
-                "gloss": entry["gloss"],
-            })
-
-    return {"terms": terms}
+def build_token_metadata(text: str):
+    """
+    Parse text tokens and return metadata for each token including position and blurb
+    """
+    try:
+        token_data = dictionary(text)  # Returns [(index, blurb), ...]
+        
+        # Convert to more structured format for frontend consumption
+        tokens = []
+        for idx, blurb in token_data:
+            # Only include tokens that have meaningful content (not just punctuation or whitespace)
+            # Find the actual word at this position
+            if idx < len(text):
+                # Look for the word boundary
+                word_start = idx
+                word_end = idx
+                
+                # Move to start of word if we're in the middle
+                while word_start > 0 and text[word_start - 1].isalnum():
+                    word_start -= 1
+                    
+                # Find end of word
+                while word_end < len(text) and text[word_end].isalnum():
+                    word_end += 1
+                
+                # Only add if it's a real word (not just punctuation)
+                if word_end > word_start and any(c.isalpha() for c in text[word_start:word_end]):
+                    tokens.append({
+                        "index": word_start,
+                        "blurb": blurb,
+                        "word": text[word_start:word_end]
+                    })
+        
+        return tokens
+    except Exception as e:
+        print(f"Error parsing tokens: {e}")
+        return []
 
 # Route: send new message
 @router.post("/{session_id}/messages", summary="Send a new message in a session")
@@ -185,8 +205,8 @@ Here is a summary of earlier conversation: {summary or "N/A"}."""
     full_prompt = "\n".join(conversation_history)
     response = chat.send_message(full_prompt)
 
-    # run the parser here
-    dictionary_context = build_dictionary_context(response.text, user["dialect"])
+    # Parse tokens for bot message
+    token_metadata = build_token_metadata(response.text)
 
     # Save messages into DB
     await db.execute(
@@ -194,8 +214,8 @@ Here is a summary of earlier conversation: {summary or "N/A"}."""
         session_id, "user", user_message
     )
     await db.execute(
-        "INSERT INTO messages (session_id, sender, content) VALUES ($1, $2, $3)",
-        session_id, "bot", response.text
+        "INSERT INTO messages (session_id, sender, content, token_metadata) VALUES ($1, $2, $3, $4)",
+        session_id, "bot", response.text, json.dumps(token_metadata)
     )
 
     return {
@@ -203,7 +223,7 @@ Here is a summary of earlier conversation: {summary or "N/A"}."""
             "reply": response.text,
             "session_id": session_id
         },
-        "dictionary": dictionary_context
+        "tokens": token_metadata
     }
 
 @router.post("/", summary="Create a new chat session")

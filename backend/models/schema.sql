@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS messages (
     session_id UUID REFERENCES sessions(id) ON DELETE CASCADE,
     sender TEXT NOT NULL,
     content TEXT NOT NULL,
+    token_metadata JSONB,  -- stores parsed token information for bot messages
     created_at TIMESTAMP DEFAULT now()
 );
 

@@ -4,8 +4,19 @@ import { use, useEffect, useState, useRef, useCallback } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useUser } from "@auth0/nextjs-auth0";
 import SessionHeader from "@/components/session-header"
+import { TokenizedMessage } from "@/components/tokenized-message"
 
-type Message = { id: string | number; sender: "user" | "bot"; content: string }
+type TokenData = {
+    index: number
+    blurb: string
+}
+
+type Message = { 
+    id: string | number; 
+    sender: "user" | "bot"; 
+    content: string;
+    token_metadata?: TokenData[]
+}
 type SessionData = { id: string; session_name: string; dialect: string; summary?: string }
 
 // Global tracking with immediate blocking
@@ -86,6 +97,7 @@ export default function ChatSession({ params }: { params: Promise<{ sessionId: s
                 id: Date.now() + 1,
                 sender: "bot",
                 content: data.llm.reply,
+                token_metadata: data.tokens
             }
             setMessages((prev) => [...prev, botMessage])
         } catch (err) {
@@ -144,6 +156,7 @@ export default function ChatSession({ params }: { params: Promise<{ sessionId: s
                             id: Date.now() + 1,
                             sender: "bot",
                             content: data.llm.reply,
+                            token_metadata: data.tokens
                         }
                         setMessages((prev) => [...prev, botMessage])
                         
@@ -182,6 +195,7 @@ export default function ChatSession({ params }: { params: Promise<{ sessionId: s
                             id: Date.now() + 1,
                             sender: "bot",
                             content: data.llm.reply,
+                            token_metadata: data.tokens
                         }
                         setMessages((prev) => [...prev, botMessage])
                         
@@ -209,11 +223,26 @@ export default function ChatSession({ params }: { params: Promise<{ sessionId: s
                 .then((res) => res.json())
                 .then((data) => {
                     // Force-cast into your Message[] type
-                    const normalized: Message[] = (Array.isArray(data) ? data : []).map((m) => ({
-                        id: m.id,
-                        sender: m.sender === "user" ? "user" : "bot",
-                        content: m.content,
-                    }))
+                    const normalized: Message[] = (Array.isArray(data) ? data : []).map((m) => {
+                        let tokenMetadata = undefined
+                        try {
+                            if (m.token_metadata && typeof m.token_metadata === 'string') {
+                                tokenMetadata = JSON.parse(m.token_metadata)
+                            } else if (m.token_metadata && typeof m.token_metadata === 'object') {
+                                tokenMetadata = m.token_metadata
+                            }
+                        } catch (e) {
+                            console.warn('Failed to parse token metadata:', e)
+                            tokenMetadata = undefined
+                        }
+                        
+                        return {
+                            id: m.id,
+                            sender: m.sender === "user" ? "user" : "bot",
+                            content: m.content,
+                            token_metadata: tokenMetadata
+                        }
+                    })
                     setMessages(normalized)
                 })
                 .catch((err) => console.error("Error fetching messages:", err))
@@ -251,7 +280,14 @@ export default function ChatSession({ params }: { params: Promise<{ sessionId: s
                                     : "bg-gray-100 text-gray-800"
                                 }`}
                         >
-                            {m.content}
+                            {m.sender === "bot" ? (
+                                <TokenizedMessage 
+                                    content={m.content}
+                                    tokenMetadata={m.token_metadata}
+                                />
+                            ) : (
+                                m.content
+                            )}
                         </div>
                     </div>
                 ))}
