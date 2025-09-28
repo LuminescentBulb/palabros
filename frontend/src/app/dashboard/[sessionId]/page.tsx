@@ -304,7 +304,7 @@ export default function ChatSession({ params }: { params: Promise<{ sessionId: s
             </div>
 
             {/* Message Input Bar */}
-            <div className="border-t p-4 bg-white">
+            <div className=" p-4">
                 <form 
                     onSubmit={(e) => {
                         e.preventDefault()

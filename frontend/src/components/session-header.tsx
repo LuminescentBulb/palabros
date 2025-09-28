@@ -90,7 +90,7 @@ export default function SessionHeader({ sessionId, sessionName, onSessionNameCha
     }
 
     return (
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+        <div className="flex items-center justify-between p-4.5 border-gray-200">
             <div className="flex items-center gap-2 flex-1">
                 {isEditing ? (
                     <div className="flex items-center gap-2 flex-1">
