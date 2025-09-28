@@ -1,0 +1,41 @@
+# Web Framework
+fastapi==0.117.1
+uvicorn==0.37.0
+starlette==0.48.0
+
+# Database
+asyncpg==0.30.0
+
+# Environment and Configuration
+python-dotenv==1.1.1
+
+# HTTP Requests
+requests==2.32.5
+httpx==0.28.1
+
+# Authentication and JWT
+python-jose[cryptography]==3.5.0
+
+# Data Validation and Serialization
+pydantic==2.11.9
+
+# Natural Language Processing
+spacy==3.8.7
+# For Spanish language model
+# Run: python -m spacy download es_core_news_sm
+
+# Google AI/Generative AI
+google-genai==1.39.1
+google-api-python-client==2.183.0
+google-auth==2.40.3
+
+# AI/ML Libraries (if needed)
+openai==0.27.10
+
+# Utilities
+tqdm==4.67.1
+tabulate==0.9.0
+
+# Development and utilities (optional)
+rich==14.1.0
+typer==0.19.2

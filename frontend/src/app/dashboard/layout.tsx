@@ -9,7 +9,7 @@ import { useUser } from "@auth0/nextjs-auth0"
 // Helper to fetch sessions from FastAPI
 async function getSessions(accessToken: string) {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/sessions`, {
+        const res = await fetch(`${process.env.BACKEND_URL}/sessions`, {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
@@ -40,7 +40,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         if (!user?.sub) return
         
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
+            const response = await fetch(`${process.env.BACKEND_URL}/users/me`, {
                 headers: {
                     'Authorization': `Bearer ${user.sub}`,
                 },
