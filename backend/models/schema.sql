@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS users (
     auth0_id TEXT UNIQUE NOT NULL,
     email TEXT,
     display_name TEXT,
-    dialect TEXT,             -- e.g. "Mexico", "Spain", "Argentina"
-    experience_level TEXT,    -- e.g. "beginner", "intermediate", "advanced"
+    dialect TEXT DEFAULT 'Chilean',             -- e.g. "Mexico", "Spain", "Argentina"
+    experience_level TEXT DEFAULT 'beginner',   -- e.g. "beginner", "intermediate", "advanced"
     facts JSONB DEFAULT '{}',  -- flexible facts field
     created_at TIMESTAMP DEFAULT now()
 );

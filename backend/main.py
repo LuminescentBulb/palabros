@@ -7,6 +7,7 @@ import asyncpg, os
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"))
 
 import backend.sessions.sessions as sessions
+import backend.users.users as users
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -42,3 +43,4 @@ def health():
 
 # Routers
 app.include_router(sessions.router, prefix="/sessions", tags=["sessions"])
+app.include_router(users.router, prefix="/users", tags=["users"])

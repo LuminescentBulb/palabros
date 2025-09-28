@@ -7,10 +7,9 @@ import { Suspense } from "react"
 import Footer from "@/components/footer"
 
 export const metadata: Metadata = {
-  title: "HablaBot - Learn Spanish Through AI Conversation",
+  title: "Palabros - Learn Casual Spanish Through AI Conversation",
   description:
     "Master Spanish slang and natural conversation with our AI chatbot. Practice with different dialects from Mexico, Spain, Argentina and more.",
-  generator: "v0.app",
 }
 
 export default function RootLayout({

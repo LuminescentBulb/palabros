@@ -1,6 +1,10 @@
+'use client'
+
 import Link from "next/link"
 import { MessageCircle, Settings } from "lucide-react"
-import { auth0 } from "@/lib/auth0"
+import { useState, useEffect } from "react"
+import SettingsModal from "@/components/settings-modal"
+import { useUser } from "@auth0/nextjs-auth0"
 
 // Helper to fetch sessions from FastAPI
 async function getSessions(accessToken: string) {
@@ -18,12 +22,56 @@ async function getSessions(accessToken: string) {
     }
 }
 
-export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-    const session = await auth0.getSession()
-    const accessToken = session?.user.sub
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+    const { user, isLoading } = useUser()
+    const [sessions, setSessions] = useState<any[]>([])
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+    const [displayName, setDisplayName] = useState<string>('')
 
-    // If user valid, get them sessions
-    const sessions = accessToken ? await getSessions(accessToken) : []
+    // Fetch sessions when user is available
+    useEffect(() => {
+        if (user?.sub) {
+            getSessions(user.sub).then(setSessions)
+            loadUserDisplayName()
+        }
+    }, [user])
+
+    const loadUserDisplayName = async () => {
+        if (!user?.sub) return
+        
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
+                headers: {
+                    'Authorization': `Bearer ${user.sub}`,
+                },
+            })
+
+            if (response.ok) {
+                const userData = await response.json()
+                // Use custom display_name if set, otherwise fall back to OAuth name
+                setDisplayName(userData.display_name || user.name || 'User')
+            } else {
+                // If user doesn't exist in DB yet, use OAuth name
+                setDisplayName(user.name || 'User')
+            }
+        } catch (error) {
+            console.error('Failed to load display name:', error)
+            // Fallback to OAuth name on error
+            setDisplayName(user.name || 'User')
+        }
+    }
+
+    // Update display name when settings modal closes (in case it was changed)
+    const handleSettingsClose = () => {
+        setIsSettingsOpen(false)
+        if (user?.sub) {
+            loadUserDisplayName() // Reload display name after settings update
+        }
+    }
+
+    if (isLoading) {
+        return <div className="flex h-screen items-center justify-center">Loading...</div>
+    }
     return (
         <div className="flex h-screen bg-gray-50">
             {/* Sidebar */}
@@ -66,16 +114,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 <div className="mt-auto p-4 border-t border-gray-200">
                     <div className="flex items-center gap-3">
                         <img
-                            src={session?.user.picture}
-                            alt={session?.user.name || "User avatar"}
+                            src={user?.picture}
+                            alt={user?.name || "User avatar"}
                             className="w-9 h-9 rounded-full flex-shrink-0"
                         />
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-gray-800 truncate">
-                                {session?.user.name}
+                                {displayName}
                             </p>
                         </div>
-                        <button className="p-2 rounded-md text-gray-500 hover:bg-gray-200 hover:text-gray-800">
+                        <button 
+                            className="p-2 rounded-md text-gray-500 hover:bg-gray-200 hover:text-gray-800"
+                            onClick={() => setIsSettingsOpen(true)}
+                        >
                             <Settings className="w-5 h-5" />
                         </button>
                     </div>
@@ -84,6 +135,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
             {/* Main */}
             <main className="flex-1 overflow-y-auto">{children}</main>
+            
+            {/* Settings Modal */}
+            <SettingsModal 
+                isOpen={isSettingsOpen} 
+                onClose={handleSettingsClose}
+                onSettingsUpdate={loadUserDisplayName}
+            />
         </div>
     )
 }
