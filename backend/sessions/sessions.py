@@ -143,6 +143,112 @@ def build_token_metadata(text: str):
         print(f"Error parsing tokens: {e}")
         return []
 
+async def extract_learner_facts(user_message: str, bot_response: str, existing_facts: dict, message_count: int = 0) -> dict:
+    """
+    Extract new learner facts from conversation to update user profile.
+    Returns updated facts dictionary.
+    Only extracts facts periodically to avoid excessive API calls.
+    """
+    try:
+        # Ensure existing_facts is a dictionary
+        if isinstance(existing_facts, str):
+            try:
+                existing_facts = json.loads(existing_facts)
+            except json.JSONDecodeError:
+                existing_facts = {}
+        elif existing_facts is None:
+            existing_facts = {}
+        elif not isinstance(existing_facts, dict):
+            existing_facts = {}
+        
+        # Only extract facts every few messages or if it's early in the conversation
+        should_extract = (
+            message_count <= 6 or  # First few messages
+            message_count % 8 == 0 or  # Every 8th message after that
+            len(existing_facts) < 3  # If we don't have many facts yet
+        )
+        
+        if not should_extract:
+            return existing_facts
+        
+        fact_extraction_prompt = """You are a language learning assistant. Analyze this conversation and extract useful facts about the learner that would help personalize future conversations.
+
+Current learner facts: {}
+
+Recent conversation:
+User: {}
+Assistant: {}
+
+Extract ANY interesting or relevant facts about the learner from this conversation. Be creative and flexible with fact categories - don't limit yourself to standard categories. Create whatever keys make sense for the information discussed.
+
+Examples of what to capture:
+- Any interests, hobbies, or specific topics mentioned (e.g., "variedades_maiz_favoritas", "deportes_extremos", "tipos_queso_preferidos")
+- Personal details, experiences, opinions (e.g., "ciudad_natal", "mascota", "comida_odiada", "experiencia_viajando")
+- Learning patterns, goals, struggles (e.g., "errores_frecuentes", "palabras_dificiles", "temas_favoritos_conversacion")
+- Quirky or unique details that make them memorable (e.g., "colecciona_sellos", "tiene_miedo_payasos", "habla_tres_idiomas")
+- Preferences, dislikes, cultural references (e.g., "musica_detesta", "peliculas_amor", "tradiciones_familiares")
+
+Use descriptive Spanish keys that capture the essence of what you learned. Values can be strings, arrays, or whatever format fits the information best.
+
+Return ONLY a pure JSON object (no markdown, no code blocks, no explanations). Keep the response concise - limit to the most important facts. Maximum 10 new facts per extraction.
+
+Example format (but don't limit yourself to these categories):
+{{"variedades_tomate_cultiva": ["cherry", "beefsteak"], "fobia_insectos": true, "receta_secreta_abuela": "empanadas de pollo", "suena_con_viajar_a": "Patagonia", "odia_sonido_unas": true}}""".format(
+            json.dumps(existing_facts, ensure_ascii=False),
+            user_message,
+            bot_response
+        )
+
+        # Use OpenRouter instead of Gemini for cost savings
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={"Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}"},
+            data=json.dumps({
+                "model": SUMMARIZER_MODEL,  # Reuse the same cost-effective model
+                "messages": [{
+                    "role": "user",
+                    "content": fact_extraction_prompt
+                }]
+            })
+        )
+        response.raise_for_status()
+        
+        # Parse the JSON response
+        try:
+            fact_response_text = response.json()["choices"][0]["message"]["content"]
+            
+            # Clean up the response - remove markdown code blocks if present
+            cleaned_text = fact_response_text.strip()
+            if cleaned_text.startswith("```json"):
+                cleaned_text = cleaned_text[7:]  # Remove ```json
+            elif cleaned_text.startswith("```"):
+                cleaned_text = cleaned_text[3:]   # Remove ```
+            if cleaned_text.endswith("```"):
+                cleaned_text = cleaned_text[:-3]  # Remove closing ```
+            cleaned_text = cleaned_text.strip()
+            
+            new_facts = json.loads(cleaned_text)
+            
+            # Merge with existing facts, giving precedence to new facts
+            updated_facts = {**existing_facts, **new_facts}
+            
+            # Limit to 100 keys maximum
+            if len(updated_facts) > 100:
+                # Keep the 100 most recent facts (new facts take precedence)
+                updated_facts = dict(list(updated_facts.items())[-100:])
+                print(f"Limited facts to 100 keys")
+            
+            print(f"Updated learner facts: {updated_facts}")  # Debug log
+            return updated_facts
+        except json.JSONDecodeError as e:
+            print(f"Failed to parse fact extraction response: {fact_response_text}")
+            print(f"JSON decode error: {e}")
+            return existing_facts
+            
+    except Exception as e:
+        print(f"Error extracting learner facts: {e}")
+        return existing_facts
+
 # Route: send new message
 @router.post("/{session_id}/messages", summary="Send a new message in a session")
 async def post_message(
@@ -207,6 +313,20 @@ Here is a summary of earlier conversation: {summary or "N/A"}."""
 
     # Parse tokens for bot message
     token_metadata = build_token_metadata(response.text)
+
+    # Extract and update learner facts (pass message count for optimization)
+    message_count = len(all_messages)
+    # Ensure facts is properly handled as a dict
+    current_facts = user['facts'] if user['facts'] is not None else {}
+    updated_facts = await extract_learner_facts(user_message, response.text, current_facts, message_count)
+    
+    # Update user facts in database if they changed
+    if updated_facts != current_facts:
+        await db.execute(
+            "UPDATE users SET facts = $1 WHERE id = $2",
+            json.dumps(updated_facts), current_user["id"]
+        )
+        print(f"Facts updated for user {current_user['id']}: {updated_facts}")
 
     # Save messages into DB
     await db.execute(

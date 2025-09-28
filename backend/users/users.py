@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 from typing import Optional
 import asyncpg
+import json
 
 router = APIRouter()
 
@@ -30,6 +31,9 @@ class UserSettings(BaseModel):
     display_name: Optional[str]
     dialect: Optional[str]
     experience_level: Optional[str]
+
+class UserFactsUpdate(BaseModel):
+    facts: dict
 
 async def get_user_id_from_token(request: Request):
     """Extract user ID from Authorization header"""
@@ -113,3 +117,43 @@ async def update_user_settings(settings: UserSettingsUpdate, request: Request):
             raise HTTPException(status_code=404, detail="User not found")
             
         return UserSettings(**dict(row))
+
+@router.get("/me/facts")
+async def get_user_facts(request: Request):
+    """Get current user's learned facts"""
+    auth0_id = await get_user_id_from_token(request)
+    
+    async with request.app.state.db.acquire() as conn:
+        # Ensure user exists
+        await ensure_user(conn, auth0_id)
+        
+        # Get user facts
+        row = await conn.fetchrow(
+            "SELECT facts FROM users WHERE auth0_id=$1",
+            auth0_id
+        )
+        
+        if not row:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return {"facts": row["facts"] or {}}
+
+@router.put("/me/facts")
+async def update_user_facts(facts_update: UserFactsUpdate, request: Request):
+    """Update current user's learned facts (for debugging/manual management)"""
+    auth0_id = await get_user_id_from_token(request)
+    
+    async with request.app.state.db.acquire() as conn:
+        # Ensure user exists
+        await ensure_user(conn, auth0_id)
+        
+        # Update facts
+        row = await conn.fetchrow(
+            "UPDATE users SET facts = $1 WHERE auth0_id = $2 RETURNING facts",
+            json.dumps(facts_update.facts), auth0_id
+        )
+        
+        if not row:
+            raise HTTPException(status_code=404, detail="User not found")
+            
+        return {"facts": row["facts"]}
