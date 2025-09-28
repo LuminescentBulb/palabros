@@ -59,7 +59,7 @@ export default function ChatSession({ params }: { params: Promise<{ sessionId: s
 
     const loadSessionData = async (id: string) => {
         try {
-            const response = await fetch(`${process.env.BACKEND_URL}/sessions/${id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sessions/${id}`, {
                 headers: {
                     "Authorization": `Bearer ${user?.sub}`
                 },
@@ -83,7 +83,7 @@ export default function ChatSession({ params }: { params: Promise<{ sessionId: s
         setNewMessage("")
 
         try {
-            const response = await fetch(`${process.env.BACKEND_URL}/sessions/${currentSessionId}/messages`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sessions/${currentSessionId}/messages`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -126,7 +126,7 @@ export default function ChatSession({ params }: { params: Promise<{ sessionId: s
                 setLoading(true)
 
                 // First, create a new session
-                fetch(`${process.env.BACKEND_URL}/sessions/`, {
+                fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sessions/`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -141,7 +141,7 @@ export default function ChatSession({ params }: { params: Promise<{ sessionId: s
                         setSessionData(sessionData)
                         
                         // Now send the first message to the new session
-                        return fetch(`${process.env.BACKEND_URL}/sessions/${newSessionId}/messages`, {
+                        return fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sessions/${newSessionId}/messages`, {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
@@ -181,7 +181,7 @@ export default function ChatSession({ params }: { params: Promise<{ sessionId: s
                 setMessages([msg])
                 setLoading(true)
 
-                fetch(`${process.env.BACKEND_URL}/sessions/${sessionId}/messages`, {
+                fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sessions/${sessionId}/messages`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -215,7 +215,7 @@ export default function ChatSession({ params }: { params: Promise<{ sessionId: s
             releaseLock(requestId)
             
             loadSessionData(sessionId)
-            fetch(`${process.env.BACKEND_URL}/sessions/${sessionId}/messages`, {
+            fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sessions/${sessionId}/messages`, {
                 headers: {
                     "Authorization": `Bearer ${user?.sub}`
                 },
@@ -315,7 +315,7 @@ export default function ChatSession({ params }: { params: Promise<{ sessionId: s
                             if (!user) return
                             
                             requestInProgressRef.current = true
-                            fetch(`${process.env.BACKEND_URL}/sessions/`, {
+                            fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sessions/`, {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json",

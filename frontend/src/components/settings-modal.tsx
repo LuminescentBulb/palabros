@@ -56,7 +56,7 @@ const dialects = [
     
     setIsLoading(true)
     try {
-      const response = await fetch(`${process.env.BACKEND_URL}/users/me`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/me`, {
         headers: {
           'Authorization': `Bearer ${user.sub}`,
         },
@@ -99,7 +99,7 @@ const dialects = [
 
     setIsSaving(true)
     try {
-      const response = await fetch(`${process.env.BACKEND_URL}/users/me`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/me`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
