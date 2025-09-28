@@ -91,7 +91,7 @@ async def summarize_history(messages: list[str]) -> str:
             "model": SUMMARIZER_MODEL,
             "messages": [{
                 "role": "user",
-                "content": f"Please summarize the following conversation:\n\n" + "\n".join(messages)
+                "content": f"Summarize conversation below. Remove articles (a/an/the), use contractions (can't/won't), possessives (user's/AI's), abbreviations. Be ultra-concise:\n\n" + "\n".join(messages)
             }]
         })
     )
@@ -190,10 +190,10 @@ Examples of what to capture:
 
 Use descriptive Spanish keys that capture the essence of what you learned. Values can be strings, arrays, or whatever format fits the information best.
 
-Return ONLY a pure JSON object (no markdown, no code blocks, no explanations). Keep the response concise - limit to the most important facts. Maximum 10 new facts per extraction.
+Return ONLY a pure JSON object (no markdown, no code blocks, no explanations). Keep the response concise - limit to the most important facts. Maximum 2 new facts per extraction.
 
 Example format (but don't limit yourself to these categories):
-{{"variedades_tomate_cultiva": ["cherry", "beefsteak"], "fobia_insectos": true, "receta_secreta_abuela": "empanadas de pollo", "suena_con_viajar_a": "Patagonia", "odia_sonido_unas": true}}""".format(
+{{"variedades_tomate_cultiva": ["cherry", "beefsteak"], "fobia_insectos": true}}""".format(
             json.dumps(existing_facts, ensure_ascii=False),
             user_message,
             bot_response
@@ -290,10 +290,20 @@ async def post_message(
     recent_messages = all_messages[-5:]
 
     # Build Gemini prompt
-    intro_prompt = f"""You are a Gen Z Spanish friend from {user['dialect']}, 
-and the user is a {user['experience_level']} learner. 
-Facts about user: {json.dumps(user['facts'])}.
-Here is a summary of earlier conversation: {summary or "N/A"}."""
+    summary_section = f"\n\nConversation Summary: {summary}" if summary else ""
+    
+    intro_prompt = f"""SYSTEM: You are Andrés, a 20-year-old Gen Z Spanish speaker from {user['dialect']}. You are chatting with a {user['experience_level']} Spanish learner as their casual online friend.
+
+CRITICAL INSTRUCTIONS:
+- Keep responses SHORT (max 20 words) like texting with friends
+- Match the user's typing style exactly (capitalization, punctuation, formality)
+- Use casual online/Discord-style Spanish, NOT excessive/forced slang
+- Give simple replies (sí, no, tal vez), encourage back-and-forth conversation
+- Use your local dialect
+
+USER FACTS: {json.dumps(user['facts'], ensure_ascii=False)}{summary_section}
+
+Respond naturally as Andrés would in a text conversation."""
 
     chat = client.chats.create(model=GEMINI_MODEL)
     
