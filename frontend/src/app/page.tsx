@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { MessageCircle, Globe, Zap, BookOpen, Star } from "lucide-react"
+import { MessageCircle, Globe, Zap, BookOpen, Star, Shield, Brain, Users, Sparkles, Lock, Settings } from "lucide-react"
 import { auth0 } from "@/lib/auth0"
 import Footer from "@/components/footer"
 
@@ -118,58 +118,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-
-      {/* Features Section */}
-      <section id="features" className="py-24 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-balance mb-4">{"Why Choose Palabros?"}</h2>
-            <p className="text-xl text-muted-foreground text-pretty max-w-2xl mx-auto">
-              {"Experience the most natural way to learn Spanish through AI-powered conversations"}
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-8">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
-                  <MessageCircle className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">{"Real-Time Corrections"}</h3>
-                <p className="text-muted-foreground">
-                  {
-                    "Get instant feedback on your Spanish. Our AI corrects formal language and shows you how natives really speak."
-                  }
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-8">
-                <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-6">
-                  <Globe className="w-6 h-6 text-secondary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">{"Multiple Dialects"}</h3>
-                <p className="text-muted-foreground">
-                  {
-                    "Choose from Mexican, Spanish, Argentinian, and other dialects. Learn the slang that matters to you."
-                  }
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-8">
-                <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-6">
-                  <BookOpen className="w-6 h-6 text-accent" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">{"Highlight to Learn"}</h3>
-                <p className="text-muted-foreground">
-                  {"Tap any word or phrase to get instant explanations, definitions, and cultural context."}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
       {/* Dialects Section */}
       <section id="dialects" className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -243,68 +191,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Social Proof */}
-      <section className="py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-balance mb-4">{"Trusted by Language Learners"}</h2>
-            <div className="flex items-center justify-center gap-2 mb-8">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-6 h-6 fill-primary text-primary" />
-              ))}
-              <span className="text-lg font-semibold ml-2">{"4.9/5 from 2,000+ learners"}</span>
-            </div>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                name: "Sarah M.",
-                role: "College Student",
-                quote: '"Finally learning Spanish that people actually use! The slang corrections are game-changing."',
-              },
-              {
-                name: "Carlos R.",
-                role: "Business Professional",
-                quote:
-                  '"Perfect for preparing for my move to Mexico. The Mexican dialect feature is incredibly authentic."',
-              },
-              {
-                name: "Emma L.",
-                role: "Travel Enthusiast",
-                quote: '"I can actually understand Spanish memes now! This app teaches real, modern Spanish."',
-              },
-            ].map((testimonial) => (
-              <Card key={testimonial.name} className="border-0 shadow-lg">
-                <CardContent className="p-8">
-                  <p className="text-muted-foreground mb-6 italic">{testimonial.quote}</p>
-                  <div>
-                    <p className="font-semibold">{testimonial.name}</p>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-r from-primary via-secondary to-accent">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground text-balance mb-6">
-            {"Ready to Speak Spanish Like a Native?"}
-          </h2>
-          <p className="text-xl text-primary-foreground/90 text-pretty mb-8">
-            {"Join thousands of learners mastering real Spanish conversation with Palabros"}
-          </p>
-          <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
-            <MessageCircle className="w-5 h-5 mr-2" />
-            {"Start Your Free Trial"}
-          </Button>
-        </div>
-      </section>
-
       <Footer />
     </div>
   )
